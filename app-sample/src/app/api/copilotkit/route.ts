@@ -17,6 +17,7 @@ const runtime = new CopilotRuntime({
   remoteEndpoints: [
     {
       url: "http://localhost:1338/copilotkit",
+      // url: "https://run.blaxel.ai/main/agents/AGENT_NAME/copilotkit",
       onBeforeRequest: () => {
         return {
           headers: {
