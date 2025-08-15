@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 
 from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
-from copilotkit.crewai import CrewAIAgent
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
@@ -29,7 +28,7 @@ async def lifespan(app: FastAPI):
         app.state.sdk = sdk
 
         # Add CopilotKit endpoint
-        add_fastapi_endpoint(app, sdk, "/copilotkit", use_thread_pool=False)
+        add_fastapi_endpoint(app, sdk, "/copilotkit")
 
         yield
         logger.info("Server shutting down")
@@ -49,7 +48,9 @@ async def get_sdk():
                 name="supervisor", description="Book a trip", graph=supervisor
             ),
             LangGraphAgent(name="hotel-agent", description="Book a hotel", graph=hotel),
-            CrewAIAgent(name="flight-agent", description="Book a flight", crew=flight),
+            LangGraphAgent(
+                name="flight-agent", description="Book a flight", graph=flight
+            ),
         ],
     )
     return sdk

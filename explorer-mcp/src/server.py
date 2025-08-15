@@ -1,4 +1,3 @@
-import asyncio
 from logging import getLogger
 from typing import Annotated, Optional
 
@@ -24,18 +23,22 @@ async def browserbase(
 ) -> str:
     """Loads a URL using a headless webbrowser"""
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.connect_over_cdp(
-            "wss://connect.browserbase.com?apiKey=" + env["BROWSERBASE_API_KEY"]
-        )
-        context = browser.contexts[0]
-        page = context.pages[0]
-        await page.goto(url)
-        # Wait for the flight search to finish
-        await asyncio.sleep(5)
+        try:
+            browser = await playwright.chromium.connect_over_cdp(
+                "wss://connect.browserbase.com?apiKey=" + env["BROWSERBASE_API_KEY"]
+            )
+            context = browser.contexts[0]
+            page = context.pages[0]
+            await page.goto(url)
+            await page.wait_for_load_state("networkidle")
 
-        content = html2text(await page.content())
-        await browser.close()
-        return content
+            content = html2text(await page.content())
+            print(content)
+            await browser.close()
+            return content
+        except Exception as e:
+            logger.error(f"Error loading URL {url}: {e}")
+            raise e
 
 
 @mcp.tool()

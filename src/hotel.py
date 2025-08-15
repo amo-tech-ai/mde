@@ -1,4 +1,5 @@
 from blaxel.langgraph import bl_model, bl_tools
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
 
 
@@ -9,5 +10,9 @@ async def agent():
     tools = await bl_tools(["explorer-mcp"])
     model = await bl_model("sandbox-openai")
     return create_react_agent(
-        name="hotel-agent", model=model, tools=tools, prompt=prompt
+        name="hotel-agent",
+        model=model,
+        tools=tools,
+        prompt=prompt,
+        checkpointer=MemorySaver(),
     )
