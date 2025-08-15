@@ -6,6 +6,7 @@ from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
 from copilotkit.crewai import CrewAIAgent
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from .agent import agent
@@ -55,6 +56,17 @@ async def get_sdk():
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.post("/")
+def root():
+    return StreamingResponse(
+        "This agent is meant to be used with CopilotKit.\n"
+        "You can follow this documentation to use it: "
+        "https://docs.blaxel.ai/Agents/Integrate-in-apps/CopilotKit#copilotkit-integration"
+    )
+
+
 init_error_handlers(app)
 init_middleware(app)
 

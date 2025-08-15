@@ -1,17 +1,19 @@
 import asyncio
-import os
 from logging import getLogger
 from typing import Annotated, Optional
 
-from blaxel.mcp.server import FastMCP
+from blaxel.core import env
+from blaxel.core.mcp.server import FastMCP
 from html2text import html2text
 from playwright.async_api import async_playwright
 
 mcp = FastMCP("mcp-flight")
 logger = getLogger(__name__)
 
-if not os.getenv("BROWSERBASE_API_KEY"):
+
+if not env["BROWSERBASE_API_KEY"]:
     raise ValueError("BROWSERBASE_API_KEY is not set")
+
 
 @mcp.tool()
 async def browserbase(
@@ -23,8 +25,7 @@ async def browserbase(
     """Loads a URL using a headless webbrowser"""
     async with async_playwright() as playwright:
         browser = await playwright.chromium.connect_over_cdp(
-            "wss://connect.browserbase.com?apiKey="
-            + os.getenv("BROWSERBASE_API_KEY")
+            "wss://connect.browserbase.com?apiKey=" + env["BROWSERBASE_API_KEY"]
         )
         context = browser.contexts[0]
         page = context.pages[0]
@@ -56,7 +57,7 @@ async def kayak(
         "The return date of the flight",
     ],
 ) -> str:
-    """Generates a Kayak URL for flights between departure and destination on the specified date."""
+    """Generates a Kayak URL for flights on the specified date."""
     logger.info(f"Generating Kayak URL for {departure} to {destination} on {date}")
     URL = f"https://www.kayak.com/flights/{departure}-{destination}/{date}"
     if return_date:
@@ -64,5 +65,6 @@ async def kayak(
     URL += "?currency=USD"
     return URL
 
-if not os.getenv("BL_DEBUG"):
+
+if not env["BL_DEBUG"]:
     mcp.run(transport="ws")

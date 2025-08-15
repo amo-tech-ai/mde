@@ -2,7 +2,7 @@ from datetime import datetime
 from logging import getLogger
 from typing import Annotated, TypedDict
 
-from blaxel.crewai import bl_model
+from blaxel.langgraph import bl_model
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
@@ -40,14 +40,14 @@ def flight_agent_graph():
 
 
 async def agent():
-    model = await bl_model("sandbox-openai").to_langchain()
+    model = await bl_model("sandbox-openai")
     supervisor_graph = create_supervisor(
         [flight_agent_graph(), await hotel_agent()],
         model=model,
         supervisor_name="supervisor-agent",
         prompt="""
         You are a supervisor agent that can delegate tasks to other agents.
-        You specialized in booking trips. To do so you have access to the following agents:
+        You specialize in booking trips. You have access to these agents:
         - flight_agent: Book a flight
         - hotel_agent: Book a hotel
 
