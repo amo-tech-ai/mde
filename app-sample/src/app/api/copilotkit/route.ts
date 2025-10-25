@@ -22,12 +22,17 @@ const runtime = new CopilotRuntime({
         return {
           headers: {
             "X-Blaxel-Authorization":
-              "Bearer <API_KEY / TOKEN>",
+              process.env.BLAXEL_API_KEY || "",
           },
         };
       },
     },
   ],
+  mcpServers: {
+    "blaxel-docs": {
+      url: "https://docs.blaxel.ai/mcp",
+    },
+  },
 });
 
 export const POST = async (req: NextRequest) => {
